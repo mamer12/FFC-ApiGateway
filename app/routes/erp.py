@@ -69,11 +69,18 @@ async def read_invoice_request(doctype: str, name: str):
 
 @router.put("/update-invoice-info", dependencies=[Depends(verify_api_key)])
 async def update_invoice_info(payload: List[UpdateDocTypePayload]):
-    results = []
-    for doc in payload:
-        try:
-            result = await update_doc_type(doc.doctype, doc.id, doc.data)
-            results.append(result)
-        except Exception as e:
-            results.append({"error": str(e)})
-    return results
+    return payload
+
+
+@router.post("/approved-request", )
+async def handle_approved_request(payload: dict):
+    """
+    Handles webhook requests from ERPNext for approved invoices.
+
+    Args:
+        payload (dict): Incoming webhook data from ERPNext.
+
+    Returns:
+        dict: Response indicating success or failure.
+    """
+    return payload
