@@ -8,7 +8,7 @@ app = FastAPI(title="ERPNext Integration API")
 # Middleware for API key validation
 @app.middleware("http")
 async def api_key_middleware(request: Request, call_next):
-    if request.url.path in ["/", "/api/v1/generate-api-key", "/api/v1/new-invoice-request", "/api/v1/invoice-request-info", "/api/v1/approved-request"]:
+    if request.url.path in ["/", "/api/v1/generate-api-key", "/api/v1/new-invoice-request", "/api/v1/loan-payment"]:
         return await call_next(request)
 
     api_key = request.headers.get("X-API-KEY")

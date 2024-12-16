@@ -1,6 +1,6 @@
 from http.client import HTTPException
-import httpx
-from dotenv import load_dotenv
+import httpx # type: ignore
+from dotenv import load_dotenv # type: ignore
 import os
 
 # Load environment variables from the .env file

@@ -9,8 +9,7 @@ class InvoiceItem(BaseModel):
     total_price: float
 
 
-class DocTypePayload(BaseModel):
-    doctype: str
+class InvoiceDocTypePayload(BaseModel):
     loan_product: str
     applicant_type: str
     applicant: str
@@ -45,7 +44,15 @@ class APIKeyResponse(BaseModel):
     key: str
     secret: str
 
-
+class PaymentDocTypePayload(BaseModel):
+    loan_type: str
+    loan_id: str
+    repayment_method: str
+    payment_date: str
+    payment_amount: float
+    source: str
+    transaction_id: Optional[str] = None
+    transaction_fee: float
 
 # Define the request body structure using Pydantic
 class FileUploadRequest(BaseModel):

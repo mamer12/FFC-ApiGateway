@@ -1,7 +1,7 @@
 from app.utils.auth import API_KEY_STORAGE, verify_api_key
 from fastapi import APIRouter, File, Form, UploadFile, HTTPException, Depends
 from typing import List
-from app.models import DocTypePayload, APIKeyResponse, UpdateDocTypePayload
+from app.models import   InvoiceDocTypePayload, PaymentDocTypePayload, UpdateDocTypePayload
 from app.services.erp_client import (
     create_doc_type,
     read_doc_type,
@@ -23,8 +23,8 @@ async def generate_api_key():
 
     return {"api_key": api_key, "api_secret": api_secret}
 
-@router.post("/new-invoice-request")
-async def create_invoice_request(payload: List[DocTypePayload]):
+@router.post("/invoice-request")
+async def create_invoice_request(payload: List[InvoiceDocTypePayload]):
     results = []
     for doc in payload:
         try:
@@ -72,7 +72,20 @@ async def update_invoice_info(payload: List[UpdateDocTypePayload]):
     return payload
 
 
-@router.post("/approved-request", )
+
+@router.post("/loan-payment")
+async def create_new_payment(payload: PaymentDocTypePayload):
+    try:
+        result = await create_doc_type("Loan Payment", payload.dict())
+        return {"result": result}
+    except HTTPException as e:
+        raise HTTPException(status_code=500, detail=f"HTTP error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+
+
+@router.post("/approved-request", dependencies=[Depends(verify_api_key)] )
 async def handle_approved_request(payload: dict):
     """
     Handles webhook requests from ERPNext for approved invoices.
