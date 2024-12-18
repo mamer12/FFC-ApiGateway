@@ -1,3 +1,4 @@
+from venv import logger
 from app.utils.auth import API_KEY_STORAGE, verify_api_key
 from fastapi import APIRouter, File, Form, UploadFile, HTTPException, Depends
 from typing import List
@@ -7,6 +8,7 @@ from app.services.erp_client import (
     read_doc_type,
     update_doc_type,
     upload_file,
+    validate_payment,
 )
 import secrets
 
@@ -72,17 +74,29 @@ async def update_invoice_info(payload: List[UpdateDocTypePayload]):
     return payload
 
 
-
+#TODO: Take back authentication
 @router.post("/loan-payment")
 async def create_new_payment(payload: PaymentDocTypePayload):
+    if "ME-" in payload.loan_id:
+        payload.loan_type = "MSME"
+    elif "RM-" in payload.loan_id:
+        payload.loan_type = "Raw Material"
+    elif "IF-" in payload.loan_id:
+        payload.loan_type = "Invoice Financing"
+    elif "MU-" in payload.loan_id:
+        payload.loan_type = "Murabaha"
     try:
-        result = await create_doc_type("Loan Payment", payload.dict())
-        return {"result": result}
+        # Validate the payment first
+        validation_result = await validate_payment(payload.dict())
+        if validation_result.get("message", {}).get("status") == "success":
+            result = await create_doc_type("Loan Payment", payload.dict())
+            return {"result": result}
+        else:
+            raise HTTPException(status_code=400, detail="Payment validation failed")
     except HTTPException as e:
         raise HTTPException(status_code=500, detail=f"HTTP error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
-
 
 
 @router.post("/approved-request", dependencies=[Depends(verify_api_key)] )

@@ -45,14 +45,16 @@ class APIKeyResponse(BaseModel):
     secret: str
 
 class PaymentDocTypePayload(BaseModel):
-    loan_type: str
+    loan_type: Optional[str] = None
     loan_id: str
-    repayment_method: str
     payment_date: str
     payment_amount: float
     source: str
     transaction_id: Optional[str] = None
     transaction_fee: float
+    phone_number: int
+    customer_name: str
+
 
 # Define the request body structure using Pydantic
 class FileUploadRequest(BaseModel):

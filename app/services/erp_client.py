@@ -14,7 +14,7 @@ API_SECRET = os.getenv("ERP_API_SECRET")
 # Headers to be used for API requests
 HEADERS = {
     "Authorization": f"token {API_KEY}:{API_SECRET}",
-    "Content-Type": "application/json"
+    'Accept': 'application/json'
 }
 
 # Mock API Key generation function (if needed)
@@ -88,3 +88,10 @@ async def upload_file(file_url: str, doctype: str, docname: str) -> str:
         raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+async def validate_payment(payload: dict):
+    async with httpx.AsyncClient() as client:
+        # Make a POST request to the ERP system to create a new DocType
+        response = await client.post(f"{BASE_URL}/api/method/financing.lending.doctype.loan_payment.loan_payment.validate_payment", headers=HEADERS, json=payload)
+        response.raise_for_status()  # Raise error if the request fails
+        return response.json()
